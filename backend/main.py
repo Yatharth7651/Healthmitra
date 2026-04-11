@@ -37,6 +37,8 @@ app.add_middleware(
         "http://localhost:5173",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:5173",
+        "http://3.6.94.101",
+        "http://3.6.94.101:3000",
         "*"  # Allow all for development
     ],
     allow_credentials=True,
