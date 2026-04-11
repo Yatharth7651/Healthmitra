@@ -187,6 +187,36 @@ SAMPLE_HOSPITALS = [
         "rating": 4.0,
         "open_hours": "24/7"
     },
+    {
+        "name": "Sanjeevani Medical Store",
+        "hospital_type": "Medical",
+        "address": "Local Market, Ahmedabad, Gujarat",
+        "district": "Ahmedabad",
+        "state": "Gujarat",
+        "latitude": 23.0500,
+        "longitude": 72.5500,
+        "phone": "079-11112222",
+        "facilities": ["Pharmacy", "OTC Medicines", "Prescription Medicines"],
+        "emergency_available": False,
+        "beds_available": 0,
+        "rating": 4.6,
+        "open_hours": "08:00 AM - 10:00 PM"
+    },
+    {
+        "name": "Dr Lal PathLabs Ahmedabad",
+        "hospital_type": "Laboratory",
+        "address": "Navrangpura, Ahmedabad, Gujarat",
+        "district": "Ahmedabad",
+        "state": "Gujarat",
+        "latitude": 23.0360,
+        "longitude": 72.5600,
+        "phone": "079-33334444",
+        "facilities": ["Blood Test", "Pathology", "Urine Test"],
+        "emergency_available": False,
+        "beds_available": 0,
+        "rating": 4.4,
+        "open_hours": "07:00 AM - 08:00 PM"
+    },
     # Delhi NCR
     {
         "name": "AIIMS New Delhi",

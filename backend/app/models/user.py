@@ -35,6 +35,7 @@ class UserCreate(BaseModel):
     current_medicines: Optional[List[str]] = []
     emergency_contact: Optional[str] = ""
     pregnancy_status: Optional[bool] = False
+    role: Optional[str] = "patient"
 
     class Config:
         json_schema_extra = {
@@ -97,6 +98,7 @@ class UserResponse(BaseModel):
     current_medicines: List[str] = []
     emergency_contact: str = ""
     pregnancy_status: bool = False
+    role: str = "patient"
     created_at: Optional[str] = None
 
 

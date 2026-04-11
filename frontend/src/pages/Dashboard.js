@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { hospitalAPI, triageAPI, reportAPI } from '../services/api';
+import { hospitalAPI, triageAPI, reportAPI, adminAPI } from '../services/api';
 
 const S = {
   page: {
@@ -212,6 +212,7 @@ function Dashboard() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [stats, setStats] = useState({ triage: 0, reports: 0, hospitals: 10 });
   const [recentHistory, setRecentHistory] = useState([]);
+  const [adminStats, setAdminStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeOfDay, setTimeOfDay] = useState('');
 
@@ -230,6 +231,17 @@ function Dashboard() {
         setStats(prev => ({ ...prev, triage: history.length }));
         const repRes = await reportAPI.getAll();
         setStats(prev => ({ ...prev, reports: repRes.data.total || 0 }));
+        
+        if (user.role === 'ashaworker' || user.role === 'admin') {
+           try {
+             const adminRes = await adminAPI.getAshaworkerStats();
+             if (adminRes.data.stats) {
+               setAdminStats(adminRes.data.stats);
+             }
+           } catch (e) {
+             console.error("Failed to load admin stats", e);
+           }
+        }
       } catch (err) {
         console.log('Dashboard load error:', err);
       } finally {
@@ -305,6 +317,26 @@ function Dashboard() {
               </Link>
             ))}
           </div>
+
+          {(user.role === 'ashaworker' || user.role === 'admin') && adminStats && (
+            <div style={{...S.tipsCard, marginBottom: '24px', background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)'}}>
+              <p style={{...S.sectionTitle, color: '#334155'}}>🛡️ Asha Worker Dashboard</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '16px' }}>
+                <div style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ color: '#64748b', fontSize: '13px', margin: '0 0 4px 0', fontWeight: '600' }}>Assigned Region</p>
+                  <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: 0, textTransform: 'capitalize' }}>
+                    {adminStats.assigned_region || 'Not Assigned'}
+                  </p>
+                </div>
+                <div style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ color: '#64748b', fontSize: '13px', margin: '0 0 4px 0', fontWeight: '600' }}>Patients Under Care</p>
+                  <p style={{ fontSize: '28px', fontWeight: '900', color: '#059669', margin: 0 }}>
+                    {adminStats.patient_count || 0}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Health Tips */}
           <div style={S.tipsCard}>

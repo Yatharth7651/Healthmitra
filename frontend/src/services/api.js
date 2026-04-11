@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -96,6 +96,7 @@ export const reportAPI = {
 export const adminAPI = {
   getStats: () => api.get('/admin/stats'),
   getTriageTrends: () => api.get('/admin/triage-trends'),
+  getAshaworkerStats: () => api.get('/admin/ashaworker-stats'),
 };
 
 export default api;

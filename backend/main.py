@@ -14,12 +14,12 @@ load_dotenv()
 async def lifespan(app: FastAPI):
     """Application startup and shutdown events"""
     # Startup
-    print("🚀 Starting HealthMitra Backend...")
+    print("Starting HealthMitra Backend...")
     await connect_to_database()
     yield
     # Shutdown
     await close_database_connection()
-    print("👋 HealthMitra Backend stopped.")
+    print("HealthMitra Backend stopped.")
 
 
 app = FastAPI(

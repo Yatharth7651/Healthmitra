@@ -473,44 +473,102 @@ class TriageService:
         # Step 1: Translate to English if needed
         translated_symptoms = self.translate_to_english(symptoms, language)
 
-        # Step 2: Extract symptoms
-        extracted = self.extract_symptoms(translated_symptoms)
+        import os
+        gemini_api_key = os.getenv("GEMINI_API_KEY")
+        llm_used = False
+        urgency_result = {}
+        extracted = []
+        medicines = []
+        precautions = []
+        recommendations = []
+        when_to_see = ""
+        suggested_facility = "Hospital"
 
-        # Step 3: Calculate urgency
-        urgency_result = self.calculate_urgency(extracted)
+        # Try using Gemini LLM first for perfect reasoning
+        if gemini_api_key:
+            try:
+                from google import genai
+                import json
+                client = genai.Client(api_key=gemini_api_key)
+                prompt = f"""
+Analyze these symptoms from a patient: '{translated_symptoms}'.
+Output raw JSON ONLY. No markdown formatting or extra text. Do not wrap in ```json block.
+Format exactly like this:
+{{
+  "urgency_level": "emergency" or "visit-clinic" or "self-care",
+  "urgency_color": "red" or "yellow" or "green",
+  "confidence": 0.9,
+  "extracted_symptoms": ["..."],
+  "possible_conditions": ["..."],
+  "medicines_info": [{{"name": "...", "dosage": "...", "type": "OTC" or "Prescription"}}],
+  "precautions": ["..."],
+  "recommendations": ["..."],
+  "when_to_see_doctor": "detailed sentence",
+  "suggested_facility": "Hospital" or "Medical" or "Laboratory"
+}}
+"""
+                response = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=prompt,
+                )
+                raw_text = response.text.strip()
+                if raw_text.startswith("```json"):
+                    raw_text = raw_text[7:-3].strip()
+                elif raw_text.startswith("```"):
+                    raw_text = raw_text[3:-3].strip()
+                
+                parsed = json.loads(raw_text)
+                urgency_result = {
+                    "urgency_level": parsed.get("urgency_level", "visit-clinic"),
+                    "urgency_color": parsed.get("urgency_color", "yellow"),
+                    "confidence": parsed.get("confidence", 0.8),
+                    "conditions": parsed.get("possible_conditions", [])
+                }
+                extracted = parsed.get("extracted_symptoms", [])
+                medicines = parsed.get("medicines_info", [])
+                precautions = parsed.get("precautions", [])
+                recommendations = parsed.get("recommendations", [])
+                when_to_see = parsed.get("when_to_see_doctor", "")
+                suggested_facility = parsed.get("suggested_facility", "Hospital")
+                llm_used = True
+                
+            except Exception as e:
+                print(f"Gemini LLM Error: {e}")
+                
+        # Fallback to rule-based engine if LLM failed or API key missing
+        if not llm_used:
+            extracted = self.extract_symptoms(translated_symptoms)
+            urgency_result = self.calculate_urgency(extracted)
+            medicines = self.get_medicine_info(urgency_result["conditions"])
+            precautions = PRECAUTIONS.get(urgency_result["urgency_level"], PRECAUTIONS["self-care"])
+            recommendations = self.get_recommendations(urgency_result["urgency_level"], extracted)
+            when_to_see = self.get_when_to_see_doctor(urgency_result["urgency_level"])
+            suggested_facility = "Hospital"
 
-        # Step 4: Get medicine info
-        medicines = self.get_medicine_info(urgency_result["conditions"])
-
-        # Step 5: Get precautions
-        precautions = PRECAUTIONS.get(
-            urgency_result["urgency_level"],
-            PRECAUTIONS["self-care"]
-        )
-
-        # Step 6: Get recommendations
-        recommendations = self.get_recommendations(
-            urgency_result["urgency_level"],
-            extracted
-        )
-
-        # Step 7: Get when to see doctor
-        when_to_see = self.get_when_to_see_doctor(urgency_result["urgency_level"])
-
-        # Step 8: Find nearby hospitals
+        # Find nearby facilities
         nearby_hospitals = []
         if latitude and longitude:
             try:
+                type_to_search = suggested_facility if (llm_used and suggested_facility in ["Medical", "Laboratory"]) else None
                 nearby_hospitals = await hospital_service.find_nearby(
                     latitude=latitude,
                     longitude=longitude,
                     radius_km=500.0,
+                    hospital_type=type_to_search,
                     emergency_only=(urgency_result["urgency_level"] == "emergency")
                 )
-            except Exception:
-                pass
+                if not nearby_hospitals and type_to_search is not None:
+                     # Fallback to general hospital search if local lab/medical store not found
+                     nearby_hospitals = await hospital_service.find_nearby(
+                        latitude=latitude,
+                        longitude=longitude,
+                        radius_km=500.0,
+                        emergency_only=(urgency_result["urgency_level"] == "emergency")
+                     )
+            except Exception as e:
+                print(f"Nearby search error: {e}")
 
-        # Step 9: Save triage record
+        # Save triage record
         record = {
             "user_id": user_id,
             "symptoms": symptoms,
@@ -528,14 +586,14 @@ class TriageService:
             "when_to_see_doctor": when_to_see,
             "latitude": latitude,
             "longitude": longitude,
-            "created_at": datetime.utcnow()
+            "created_at": datetime.utcnow(),
+            "llm_used": llm_used
         }
 
         await db.triage_records.insert_one(record)
 
-        # Step 10: Build response
         disclaimer = (
-            "⚠️ DISCLAIMER: This is an AI-based preliminary assessment only. "
+            "⚠️ DISCLAIMER: This is an AI-based assessment. "
             "It is NOT a medical diagnosis. Always consult a qualified doctor. "
             "In case of emergency, call 108/102 immediately."
         )
@@ -552,7 +610,8 @@ class TriageService:
             "when_to_see_doctor": when_to_see,
             "disclaimer": disclaimer,
             "nearby_hospitals": nearby_hospitals[:5],
-            "translated_response": None
+            "translated_response": None,
+            "suggested_facility": suggested_facility
         }
 
     async def get_user_history(self, user_id: str) -> list:

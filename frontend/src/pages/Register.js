@@ -155,7 +155,7 @@ function Register() {
     full_name: '', email: '', password: '', phone: '',
     age: '', gender: 'male', village: '', district: '',
     state: '', preferred_language: 'english',
-    known_diseases: '', allergies: '', emergency_contact: ''
+    known_diseases: '', allergies: '', emergency_contact: '', role: 'patient'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -199,7 +199,8 @@ function Register() {
         id: res.data.user_id,
         full_name: formData.full_name,
         email: formData.email,
-        preferred_language: formData.preferred_language
+        preferred_language: formData.preferred_language,
+        role: formData.role
       }));
       navigate('/dashboard');
     } catch (err) {
@@ -263,6 +264,14 @@ function Register() {
                   <label style={S.label}>Password * (min 6 chars)</label>
                   <input type="password" name="password" value={formData.password} onChange={handleChange}
                     style={S.input} placeholder="Create a strong password" onFocus={inputFocus} onBlur={inputBlur} />
+                </div>
+
+                <div style={S.inputWrap}>
+                  <label style={S.label}>I am registering as *</label>
+                  <select name="role" value={formData.role} onChange={handleChange} style={S.select}>
+                    <option value="patient">Patient</option>
+                    <option value="ashaworker">Asha Worker / Admin</option>
+                  </select>
                 </div>
 
                 <div style={S.grid2}>
