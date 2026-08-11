@@ -5,8 +5,34 @@ An Enterprise-Grade AI-Powered Healthcare Platform designed specifically for rur
 
 Featuring AI-Powered Symptom Triage, Multilingual NLP (English, Hindi, Gujarati, Tamil, Marathi), GPS Geospatial Hospital Discovery (Haversine & 2dsphere), Vision Medical Report Analyzer, ASHA Community Worker Dashboard, Bcrypt/JWT Security, and Full Microservice Containerization.
 
-🏗️ System Architecture & End-to-End Data Flow
+## 🏗️ System Architecture & End-to-End Data Flow
+
 The platform implements an asynchronous, microservice architecture spanning from hands-free voice and text input down to Groq Vision document analysis and geospatial hospital retrieval.
+
+```mermaid
+flowchart TD
+    A[👤 Patient / ASHA Worker Input\nText, Voice, PDF, GPS] --> B[⚡ Nginx Reverse Proxy Gateway]
+    
+    B --> C[🚀 FastAPI REST Backend]
+    
+    C --> D1[🩺 AI Symptom Triage Engine\n60+ Rules & Groq Llama 3.3 70B]
+    C --> D2[🌐 Multilingual Translator\nHindi, Gujarati, Tamil, Marathi]
+    C --> D3[🏨 Geospatial Hospital Finder\nHaversine + 2dsphere GeoJSON]
+    C --> D4[📄 Medical Report Analyzer\nGroq Llama 3.2 Vision API]
+    C --> D5[👩‍⚕️ ASHA Worker Admin Module\nVillage Analytics & Patient Management]
+    
+    D1 --> E[(🍃 MongoDB Atlas Database\nUsers, Triage, Hospitals, Reports)]
+    D2 --> E
+    D3 --> E
+    D4 --> E
+    D5 --> E
+    
+    E --> F[💬 React 19 Web Dashboard]
+    E --> G[🗺️ Interactive Leaflet Map Canvas]
+```
+
+---
+
 
 
 🔥 Key Technical Highlights & Features
@@ -30,7 +56,9 @@ Bcrypt Password Security: Direct salted password hashing protecting user data pr
 6. 💊 OTC Medicine Information & Safety Engine
 Over-the-Counter Guidance: Database of essential OTC medications, dosages, and safety precautions.
 Drug Interaction Checker: Basic interaction warnings preventing unsafe self-medication.
-📁 Repository Folder Structure
+## 📁 Repository Folder Structure
+
+```
 healthmitra/
 ├── backend/                        # FastAPI Backend Service
 │   ├── app/
@@ -56,6 +84,10 @@ healthmitra/
 ├── assets/                         # Interface Screenshots & Visual Assets
 ├── docker-compose.yml              # Multi-Container Microservice Orchestration
 └── README.md                       # Main Project Documentation
+```
+
+---
+
 📸 Platform Interface Screenshots & Dashboards
 🌐 Live Deployment: http://13.232.60.226/
 
