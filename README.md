@@ -61,27 +61,35 @@ healthmitra/
 
 1. 📊 Main Patient Dashboard
 Main Dashboard
+<img width="1869" height="862" alt="image" src="https://github.com/user-attachments/assets/587bc0be-231c-497f-88bc-0fcbbfb5d428" />
 
 2. 🩺 AI Symptom Checker Interface
 Symptom Checker
+<img width="1919" height="872" alt="image" src="https://github.com/user-attachments/assets/9c1bdcad-b967-4822-8a9f-3c5160536ae5" />
 
 3. 🎯 Emergency & Urgency Triage Result
-Triage Result
+<img width="1487" height="755" alt="image" src="https://github.com/user-attachments/assets/94e3878a-ab97-4202-bd70-d05e5e372018" />
 
 4. 🏨 GPS Hospital Locator & Leaflet Map
 Hospital Locator
+<img width="1882" height="870" alt="image" src="https://github.com/user-attachments/assets/5d46ee8e-dee1-46e6-b9da-27b1b770a690" />
 
 5. 📄 AI PDF Medical Report Analyzer
 Report Analyzer
+<img width="1666" height="874" alt="image" src="https://github.com/user-attachments/assets/35f45213-2139-4cf2-8b40-4e6dccc30195" />
 
 6. 🚨 Emergency SOS & Helpline Panel
 Emergency SOS
+<img width="1614" height="561" alt="image" src="https://github.com/user-attachments/assets/30d1cbe1-0aa1-41e5-aad2-2a215da22378" />
 
 7. 🔐 User Authentication Portal
 Login Page
+<img width="1364" height="839" alt="image" src="https://github.com/user-attachments/assets/625dd061-531e-42b0-93a1-381dcc798bb3" />
 
 8. 🌐 Public Platform Landing Page
 Landing Page
+<img width="1919" height="838" alt="image" src="https://github.com/user-attachments/assets/b8cae79c-019f-4c23-a97f-b99397dcf28e" />
+
 
 🚀 Quickstart & Installation
 Option A: Running with Docker Compose (Recommended)
